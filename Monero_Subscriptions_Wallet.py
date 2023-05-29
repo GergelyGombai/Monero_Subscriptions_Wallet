@@ -8,13 +8,14 @@ import qrcode
 import random
 import requests
 import threading
-import pyperclip
 import subprocess
 from lxml import html
 import monero_usd_price
 import PySimpleGUI as sg
 from datetime import datetime
 import platform
+import clipboard
+
 
 
 # OVERALL FUNCTIONS ####################################################################################################
@@ -671,7 +672,7 @@ def update_gui_balance():
             if not wallet_balance_usd == '---.--':
                 window['wallet_balance_in_usd'].update(f'        Balance:  ${wallet_balance_usd} USD')
 
-            window['wallet_balance_in_xmr'].update(f'        XMR: {wallet_balance_xmr}')
+            window['wallet_balance_in_xmr'].update(f'        XMR: {wallet_balance_xmr:.12f}')
 
             # Wait before updating again
             time.sleep(5)
@@ -910,7 +911,7 @@ else:
 wallet_name = "subscriptions_wallet"
 wallet_file_path = f'{os.getcwd()}/'  # Update this path to the location where you want to save the wallet file
 subs_file_path = 'Subscriptions.json'
-rpc_bind_port = '18082'
+rpc_bind_port = '18088'
 local_rpc_url = f"http://127.0.0.1:{rpc_bind_port}/json_rpc"
 rpc_username = "monero"
 rpc_password = "monero"
@@ -1093,7 +1094,9 @@ def create_window(subscriptions): # Creates the main window and returns it
             [sg.Text("", font=(font, 8), expand_x=True, justification='center', size=(None, 1), pad=(0, 0), text_color=main_text, background_color=ui_overall_background)],
     ]
     if platform.system() == 'Darwin':
-        return sg.Window('Monero Subscriptions Wallet', layout, margins=(20, 20), titlebar_icon='', titlebar_background_color=ui_overall_background, use_custom_titlebar=False, grab_anywhere=True, icon=icon, finalize=True)
+        return sg.Window('Monero Subscriptions Wallet', layout, margins=(20, 20), titlebar_icon='', titlebar_background_color=ui_overall_background, use_custom_titlebar=False, grab_anywhere=True, icon="./icon.png", finalize=True)
+    elif platform.system() == 'Linux':
+        return sg.Window('Monero Subscriptions Wallet', layout, margins=(20, 20), titlebar_icon='', titlebar_background_color=ui_overall_background, use_custom_titlebar=False, grab_anywhere=True, icon="./icon.png", finalize=True)
     else:
         return sg.Window(title_bar_text, layout, margins=(20, 20), titlebar_icon='', titlebar_background_color=ui_overall_background, use_custom_titlebar=True, grab_anywhere=True, icon=icon, finalize=True)
 
@@ -1114,7 +1117,7 @@ while True:
         break
 
     elif event == 'copy_address':
-        pyperclip.copy(wallet_address)  # copy to clipboard
+        clipboard.copy(wallet_address)
         print(f'COPIED: {wallet_address}')
 
     elif event == 'add_subscription':
